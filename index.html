@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Bestie</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="balloon-sky" id="balloonSky" aria-hidden="true"></div>
+  <div class="heart-layer" id="heartLayer" aria-hidden="true"></div>
+  <div class="pop-layer" id="popLayer" aria-hidden="true"></div>
+  <audio id="bgMusic" loop preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_c70663f15f.mp3?filename=beautiful-piano-for-love-111730.mp3" type="audio/mpeg">
+  </audio>
+
+  <main class="wrap">
+    <section class="hero glass tilt-card">
+      <div class="hero-copy">
+        <p class="eyebrow">for my best friend</p>
+        <h1 id="heroTitle">Happy Birthday</h1>
+        <p class="hero-text" id="heroText">A tiny little surprise made with love, just for you.</p>
+        <div class="hero-row">
+          <div class="pill">
+            <span class="pill-label">Turns</span>
+            <strong id="ageValue">19</strong>
+          </div>
+          <div class="pill">
+            <span class="pill-label">Countdown</span>
+            <strong id="countdownInline">00d 00h</strong>
+          </div>
+        </div>
+        <div class="music-row">
+          <button id="musicBtn" class="primary-btn" type="button">Play Music</button>
+          <label class="upload-chip" for="musicInput">Choose Music</label>
+          <input id="musicInput" type="file" accept="audio/*" hidden>
+          <label class="upload-chip" for="photoInput">Choose Her Photo</label>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+        </div>
+      </div>
+
+      <div class="cake-3d hidden" id="cake3d">
+        <div class="cake-plate"></div>
+        <div class="cake-base"></div>
+        <div class="cake-top"></div>
+        <div class="candle c1"><span class="flame"></span></div>
+        <div class="candle c2"><span class="flame"></span></div>
+        <div class="candle c3"><span class="flame"></span></div>
+        <div class="cake-photo-ring">
+          <img id="cakePhoto" alt="Birthday girl photo">
+        </div>
+        <div class="cake-banner">
+          <p>Happy birthday to the girl turning 19</p>
+          <small id="cakeSpecialNote">A special little note appears here on her day.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="count-card glass tilt-card">
+      <p class="eyebrow">birthday countdown</p>
+      <div class="count-grid">
+        <div class="time-box"><span id="days">00</span><small>Days</small></div>
+        <div class="time-box"><span id="hours">00</span><small>Hours</small></div>
+        <div class="time-box"><span id="minutes">00</span><small>Minutes</small></div>
+        <div class="time-box"><span id="seconds">00</span><small>Seconds</small></div>
+      </div>
+      <p class="count-note" id="countNote">Counting down to your special day.</p>
+    </section>
+
+    <section class="vault glass tilt-card">
+      <div class="vault-head">
+        <p class="eyebrow">unlock the note</p>
+        <h2>One small math question</h2>
+      </div>
+
+      <div class="problem-box">
+        <p id="problemText">Loading question...</p>
+      </div>
+
+      <div class="answer-row">
+        <input id="answerInput" type="number" inputmode="numeric" placeholder="Type answer">
+        <button id="checkBtn" class="primary-btn" type="button">Open Note</button>
+      </div>
+
+      <p class="feedback" id="feedback">Solve it correctly to read the hidden note.</p>
+
+      <article class="note-card hidden" id="noteCard">
+        <p class="eyebrow">personal note</p>
+        <div class="note-text" id="noteText"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
