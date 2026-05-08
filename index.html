@@ -1,98 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Birthday Bestie</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, My love</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-color: #ff7eb3;
+            --secondary-color: #ff758c;
+        }
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #fff0f5;
+            color: #4a4a4a;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .handwritten {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Floating Hearts Animation Background */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .heart {
+            position: absolute;
+            bottom: -100px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 126, 179, 0.4);
+            transform: rotate(45deg);
+            animation: floatUp 10s linear infinite;
+        }
+
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .heart::before { top: -10px; left: 0; }
+        .heart::after { top: 0; left: -10px; }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(45deg) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(45deg) scale(1.2); opacity: 0; }
+        }
+
+        /* Entrance Overlay */
+        #entrance {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 1s ease-out;
+        }
+
+        /* Polaroids */
+        .polaroid {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+            z-index: 10;
+        }
+        .polaroid:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        /* Timeline Line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ffb7b2;
+            transform: translateX(-50%);
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+            will-change: opacity, visibility;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+    </style>
 </head>
-<body>
-  <div class="bg-orb orb-one"></div>
-  <div class="bg-orb orb-two"></div>
-  <div class="balloon-sky" id="balloonSky" aria-hidden="true"></div>
-  <div class="heart-layer" id="heartLayer" aria-hidden="true"></div>
-  <div class="pop-layer" id="popLayer" aria-hidden="true"></div>
-  <audio id="bgMusic" loop preload="auto">
-    <source src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_c70663f15f.mp3?filename=beautiful-piano-for-love-111730.mp3" type="audio/mpeg">
-  </audio>
+<body class="antialiased">
 
-  <main class="wrap">
-    <section class="hero glass tilt-card">
-      <div class="hero-copy">
-        <p class="eyebrow">for my best friend</p>
-        <h1 id="heroTitle">Happy Birthday</h1>
-        <p class="hero-text" id="heroText">A tiny little surprise made with love, just for you.</p>
-        <div class="hero-row">
-          <div class="pill">
-            <span class="pill-label">Turns</span>
-            <strong id="ageValue">19</strong>
-          </div>
-          <div class="pill">
-            <span class="pill-label">Countdown</span>
-            <strong id="countdownInline">00d 00h</strong>
-          </div>
+    <!-- Background Animation -->
+    <div class="hearts-bg" id="heartsContainer"></div>
+
+    <!-- Entrance Screen -->
+    <div id="entrance">
+        <div class="text-center p-8 bg-white/30 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 max-w-md mx-4">
+            <i data-lucide="gift" class="w-16 h-16 text-rose-500 mx-auto mb-4 animate-bounce"></i>
+            <h1 class="text-3xl md:text-4xl text-rose-600 mb-2 font-bold">A Surprise for You</h1>
+            <p class="text-gray-700 mb-6 font-medium">Put on your headphones & relax.</p>
+            <button onclick="startExperience()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                <i data-lucide="heart"></i> Open Gift
+            </button>
         </div>
-        <div class="music-row">
-          <button id="musicBtn" class="primary-btn" type="button">Play Music</button>
-          <label class="upload-chip" for="musicInput">Choose Music</label>
-          <input id="musicInput" type="file" accept="audio/*" hidden>
-          <label class="upload-chip" for="photoInput">Choose Her Photo</label>
-          <input id="photoInput" type="file" accept="image/*" hidden>
+    </div>
+
+    <!-- Main Content (Hidden initially) -->
+    <main id="main-content" class="hidden opacity-0 transition-opacity duration-1000">
+        
+        <!-- Music Player (Fixed Bottom Right) -->
+        <div class="fixed bottom-4 right-4 z-40 bg-white/90 backdrop-blur p-3 rounded-full shadow-lg border border-rose-200 flex items-center gap-3">
+            <button onclick="toggleMusic()" class="text-rose-500 hover:bg-rose-50 p-2 rounded-full transition">
+                <i id="musicIcon" data-lucide="music" class="w-6 h-6 animate-pulse"></i>
+            </button>
+            <span class="text-xs font-medium text-rose-400 pr-2 hidden md:block">Playing our song...</span>
+            <audio id="bgMusic" loop>
+                <!-- REPLACE THIS WITH YOUR OWN MP3 URL -->
+                <source src="I_M_Done.mp3" type="audio/mpeg">
+            </audio>
         </div>
-      </div>
 
-      <div class="cake-3d hidden" id="cake3d">
-        <div class="cake-plate"></div>
-        <div class="cake-base"></div>
-        <div class="cake-top"></div>
-        <div class="candle c1"><span class="flame"></span></div>
-        <div class="candle c2"><span class="flame"></span></div>
-        <div class="candle c3"><span class="flame"></span></div>
-        <div class="cake-photo-ring">
-          <img id="cakePhoto" alt="Birthday girl photo">
-        </div>
-        <div class="cake-banner">
-          <p>Happy birthday to the girl turning 19</p>
-          <small id="cakeSpecialNote">A special little note appears here on her day.</small>
-        </div>
-      </div>
-    </section>
+        <!-- Hero Section -->
+        <section class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative">
+            <div class="max-w-4xl mx-auto z-10">
+                <span class="inline-block py-1 px-3 rounded-full bg-rose-100 text-rose-600 text-sm font-semibold mb-4 tracking-wider uppercase">Today is special</span>
+                <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 leading-tight">
+                    Happy Birthday, <br>
+                    <span class="text-rose-500 handwritten text-6xl md:text-8xl block mt-2">Diksha</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-600 mt-6 max-w-2xl mx-auto italic font-light">
+                    "No matter how many people I meet, my heart always chooses you."
+                </p>
+                <div class="mt-10">
+                    <i data-lucide="chevron-down" class="w-8 h-8 text-rose-400 animate-bounce mx-auto"></i>
+                </div>
+            </div>
+        </section>
 
-    <section class="count-card glass tilt-card">
-      <p class="eyebrow">birthday countdown</p>
-      <div class="count-grid">
-        <div class="time-box"><span id="days">00</span><small>Days</small></div>
-        <div class="time-box"><span id="hours">00</span><small>Hours</small></div>
-        <div class="time-box"><span id="minutes">00</span><small>Minutes</small></div>
-        <div class="time-box"><span id="seconds">00</span><small>Seconds</small></div>
-      </div>
-      <p class="count-note" id="countNote">Counting down to your special day.</p>
-    </section>
+        <!-- Counter Section -->
+        <section class="py-20 bg-white/50 fade-in-section">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-10">Time Since We Met</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-rose-300">
+                        <span id="days" class="block text-4xl font-bold text-gray-800"></span>
+                        <span class="text-gray-500 text-sm uppercase tracking-wide">Days</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-rose-300">
+                        <span id="hours" class="block text-4xl font-bold text-gray-800">0</span>
+                        <span class="text-gray-500 text-sm uppercase tracking-wide">Hours</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-rose-300">
+                        <span id="minutes" class="block text-4xl font-bold text-gray-800">0</span>
+                        <span class="text-gray-500 text-sm uppercase tracking-wide">Minutes</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-rose-300">
+                        <span id="seconds" class="block text-4xl font-bold text-gray-800">0</span>
+                        <span class="text-gray-500 text-sm uppercase tracking-wide">Seconds</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <section class="vault glass tilt-card">
-      <div class="vault-head">
-        <p class="eyebrow">unlock the note</p>
-        <h2>One small math question</h2>
-      </div>
+        <!-- Our Memory Lane (Timeline) -->
+        <section class="py-20 relative fade-in-section">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-16">Our Journey Together</h2>
+                
+                <!-- <div class="relative timeline-line max-w-4xl mx-auto"> -->
+                    
+                    <!-- Memory 1 -->
+                    <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-5/12 text-center md:text-right pr-0 md:pr-8 mb-4 md:mb-0 order-1 md:order-1">
+                            <h3 class="text-2xl font-bold text-rose-500">The First Hello</h3>
+                            <span class="text-sm text-gray-400">September, 2025</span>
+                            <p class="mt-2 text-gray-600">Who knew that one simple ‘Hello’ on LinkedIn would become the beginning of my favorite love story. That moment changed everything for me.</p>
+                        </div>
+                        <!-- <div class="w-8 h-8 bg-rose-500 rounded-full border-4 border-white shadow absolute left-1/2 transform -translate-x-1/2 order-2 md:order-2"></div> -->
+                        <div class="w-full md:w-5/12 pl-0 md:pl-8 order-3 md:order-3">
+                            <img src="https://i.insider.com/5d434b0fb44ce750996e6bd9?width=700" alt="First Date" class="rounded-xl shadow-lg hover:scale-105 transition duration-300 w-full md:w-64 object-cover h-40">
+                        </div>
+                    </div>
 
-      <div class="problem-box">
-        <p id="problemText">Loading question...</p>
-      </div>
+                    <!-- Memory 2 -->
+                    <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-5/12 text-center md:text-left pl-0 md:pl-8 mb-4 md:mb-0 order-1 md:order-3">
+                            <h3 class="text-2xl font-bold text-rose-500">First Adventure</h3>
+                            <span class="text-sm text-gray-400">Our College</span>
+                            <p class="mt-2 text-gray-600">Every adventure with you feels like a beautiful chapter of a story I never want to finish, because with you even the simplest moments feel magical.</p>
+                        </div>
+                        <!-- <div class="w-8 h-8 bg-rose-500 rounded-full border-4 border-white shadow absolute left-1/2 transform -translate-x-1/2 order-2 md:order-2"></div> -->
+                        <div class="w-full md:w-5/12 pr-0 md:pr-8 text-right order-3 md:order-1 flex justify-end">
+                             <img src="diksha5.jpeg" alt="Adventure" class="rounded-xl shadow-lg hover:scale-105 transition duration-300 w-full md:w-64 object-cover h-40">
+                        </div>
+                    </div>
 
-      <div class="answer-row">
-        <input id="answerInput" type="number" inputmode="numeric" placeholder="Type answer">
-        <button id="checkBtn" class="primary-btn" type="button">Open Note</button>
-      </div>
+                     <!-- Memory 3 -->
+                     <div class="mb-8 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-5/12 text-center md:text-right pr-0 md:pr-8 mb-4 md:mb-0 order-1 md:order-1">
+                            <h3 class="text-2xl font-bold text-rose-500">Today</h3>
+                            <span class="text-sm text-gray-400">Present Day</span>
+                            <p class="mt-2 text-gray-600">Celebrating the most amazing person I know. I can't wait for all the memories we have yet to make.</p>
+                        </div>
+                        <!-- <div class="w-8 h-8 bg-rose-500 rounded-full border-4 border-white shadow absolute left-1/2 transform -translate-x-1/2 order-2 md:order-2"></div> -->
+                        <div class="w-full md:w-5/12 pl-0 md:pl-8 order-3 md:order-3">
+                             <img src="https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=400" alt="Celebration" class="rounded-xl shadow-lg hover:scale-105 transition duration-300 w-full md:w-64 object-cover h-40">
+                        </div>
+                    </div>
 
-      <p class="feedback" id="feedback">Solve it correctly to read the hidden note.</p>
+                </div>
+            </div>
+        </section>
 
-      <article class="note-card hidden" id="noteCard">
-        <p class="eyebrow">personal note</p>
-        <div class="note-text" id="noteText"></div>
-      </article>
-    </section>
-  </main>
+        <!-- Polaroid Gallery -->
+        <section class="py-20 bg-rose-50 fade-in-section">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12">Capturing Us</h2>
+                <div class="flex flex-wrap justify-center gap-8">
+                    <!-- Photo 1 -->
+                    <div class="polaroid w-64">
+                        <div class="h-64 bg-gray-200 mb-4 overflow-hidden">
+                            <img src="diksha4.jpeg" alt="Couple" class="w-full h-full object-cover">
+                        </div>
+                        <p class="handwritten text-2xl text-gray-600">Just us</p>
+                    </div>
+                    <!-- Photo 2 -->
+                    <div class="polaroid w-64">
+                        <div class="h-64 bg-gray-200 mb-4 overflow-hidden">
+                            <img src="diksha2.jpeg" alt="Smile" class="w-full h-full object-cover">
+                        </div>
+                        <p class="handwritten text-2xl text-gray-600">Your Smile</p>
+                    </div>
+                    <!-- Photo 3 -->
+                    <div class="polaroid w-64">
+                        <div class="h-64 bg-gray-200 mb-4 overflow-hidden">
+                            <img src="diksha3.jpeg" alt="Silly" class="w-full h-full object-cover">
+                        </div>
+                        <p class="handwritten text-2xl text-gray-600">Silly Moments</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <script src="script.js"></script>
+        <!-- The Letter -->
+        <section class="py-24 px-4 bg-white fade-in-section">
+            <div class="max-w-3xl mx-auto bg-gray-50 p-8 md:p-12 rounded-lg shadow-inner border border-gray-100 relative">
+                <i data-lucide="quote" class="absolute top-8 left-8 text-rose-200 w-12 h-12 -z-1"></i>
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">A Note for You</h2>
+                <div class="prose prose-lg mx-auto text-gray-600 leading-relaxed font-light">
+                    <p class="mb-4">My Dearest Dikshuuu,</p>
+                    <p class="mb-4">
+                        Happy Birthday to the girl who makes my life feel special every single day.
+                    </p>
+                    <p class="mb-4">
+                        You are my peace, my happiness, and honestly one of the best things that ever happened to me. Your smile, your voice, and even the little moments with you mean more to me than you know.
+                    </p>        
+                        I just want you to stay happy, keep smiling, and always remember that you are deeply loved.
+                    </p>
+                    <br
+                    <p class="mb-8">
+                        Thank you for being mine.
+                    </p>
+                    <p class="text-right font-bold text-rose-500 handwritten text-3xl">- Vansh</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-rose-100 py-8 text-center">
+            <p class="text-rose-400 font-medium">Made with ❤️ and a little bit of skills</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- 1. Icons ---
+        lucide.createIcons();
+
+        // --- 2. Background Hearts ---
+        function createHearts() {
+            const container = document.getElementById('heartsContainer');
+            const heartCount = 15; 
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 5 + 5 + 's'; 
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        // --- 3. Music & Entrance ---
+        const audio = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('musicIcon');
+        let isPlaying = false;
+
+        function startExperience() {
+            // Hide entrance
+            const entrance = document.getElementById('entrance');
+            entrance.style.opacity = '0';
+            setTimeout(() => {
+                entrance.style.display = 'none';
+                
+                // Show Main Content
+                const main = document.getElementById('main-content');
+                main.classList.remove('hidden');
+                // Trigger reflow
+                void main.offsetWidth; 
+                main.style.opacity = '1';
+
+                // Confetti Explosion
+                triggerConfetti();
+
+                // Play Music (User interaction required for autoplay policies)
+                toggleMusic();
+            }, 1000);
+        }
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                musicIcon.setAttribute('data-lucide', 'music');
+                // stop animation classes if desired
+            } else {
+                audio.play().catch(e => console.log("Audio play failed (user interaction needed):", e));
+                musicIcon.setAttribute('data-lucide', 'pause');
+            }
+            lucide.createIcons();
+            isPlaying = !isPlaying;
+        }
+
+        function triggerConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff7eb3', '#ff758c', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff7eb3', '#ff758c', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // --- 4. Counter (Time Since Met) ---
+        // SET YOUR START DATE HERE: YYYY, MM (0-11), DD
+        const startDate = new Date(2025, 9, 1); // sep 1, 2025
+
+        function updateCounter() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('days').innerText = days;
+            document.getElementById('hours').innerText = hours;
+            document.getElementById('minutes').innerText = minutes;
+            document.getElementById('seconds').innerText = seconds;
+        }
+        setInterval(updateCounter, 1000);
+        updateCounter(); // initial call
+
+        // --- 5. Scroll Animations ---
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+
+    </script>
 </body>
 </html>
